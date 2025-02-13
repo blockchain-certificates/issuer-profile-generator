@@ -40,7 +40,7 @@ async function askVerificationMethod (rootQuestion, currentIndex) {
       console.log('Invalid option. Please enter "own/o" or "generate/g".');
     }
     askVerificationMethod(rootQuestion);
-  } else if (expectedAnswer(answer, 'no')) {
+  } else if (expectedAnswer(answer, 'no') || answer === '') {
     askQuestion(currentIndex + 1);
   } else {
     console.log('Invalid option. Please enter "yes/y" or "no/n".');
