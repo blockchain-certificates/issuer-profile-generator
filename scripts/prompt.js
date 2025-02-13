@@ -9,7 +9,7 @@ const questions = [
   { key: 'name', question: 'Enter the name of the organization: ' },
   { key: 'email', question: 'Enter a contact email address: ' },
   { key: 'image', question: 'Enter the base64 image as logo: ' },
-  { key: 'verificationMethod', question: 'Do you want to add a verification method? (yes/no): '}
+  { key: 'verificationMethod', question: 'Do you want to add a verification method? (y)es/(n)o: '}
 ];
 
 let answers = {};
@@ -27,7 +27,7 @@ function expectedAnswer (answer, expected) {
 async function askVerificationMethod (rootQuestion, currentIndex) {
   const answer = await prompt(rootQuestion);
   if (expectedAnswer(answer, 'yes')) {
-    const method = await prompt('Do you want to add a verification method you own or generate one? (own/generate): ');
+    const method = await prompt('Do you want to add a verification method you own or generate one? (o)wn/(g)enerate: ');
     if (expectedAnswer(method, 'own')) {
       prompt('Enter your verification method: ', (method) => {
         answers.verificationMethod.push(method);
@@ -37,13 +37,13 @@ async function askVerificationMethod (rootQuestion, currentIndex) {
       console.log(`Generated method: ${generatedMethod}`);
       answers.verificationMethod.push(generatedMethod);
     } else {
-      console.log('Invalid option. Please enter "own" or "generate".');
+      console.log('Invalid option. Please enter "own/o" or "generate/g".');
     }
     askVerificationMethod(rootQuestion);
   } else if (expectedAnswer(answer, 'no')) {
     askQuestion(currentIndex + 1);
   } else {
-    console.log('Invalid option. Please enter "yes" or "no".');
+    console.log('Invalid option. Please enter "yes/y" or "no/n".');
     askVerificationMethod(rootQuestion);
   }
 }
