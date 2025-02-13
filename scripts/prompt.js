@@ -14,52 +14,56 @@ const questions = [
 
 let answers = {};
 
-const askVerificationMethod = (rootQuestion, currentIndex) => {
-  rl.question(rootQuestion, (answer) => {
-    if (answer.toLowerCase() === 'yes' || answer.toLowerCase() === 'y') {
-      rl.question('Do you want to add a verification method you own or generate one? (own/generate): ', (methodType) => {
-        if (methodType.toLowerCase() === 'own' || methodType.toLowerCase() === 'o') {
-          rl.question('Enter your verification method: ', (method) => {
-            answers.verificationMethod.push(method);
-          });
-        } else if (methodType.toLowerCase() === 'generate' || methodType.toLowerCase() === 'g') {
-          const generatedMethod = `generated-method-${Date.now()}`;
-          console.log(`Generated method: ${generatedMethod}`);
-          answers.verificationMethod.push(generatedMethod);
-        } else {
-          console.log('Invalid option. Please enter "own" or "generate".');
-        }
-        askVerificationMethod(rootQuestion);
-      });
-    } else if (answer.toLowerCase() === 'no' || answer.toLowerCase() === 'n') {
-      askQuestion(currentIndex + 1);
-    } else {
-      console.log('Invalid option. Please enter "yes" or "no".');
-      askVerificationMethod(rootQuestion);
-    }
+function prompt (question) {
+  return new Promise((resolve) => {
+    rl.question(question, resolve);
   });
-};
+}
 
-const askQuestion = (index) => {
+async function askVerificationMethod (rootQuestion, currentIndex) {
+  const answer = await prompt(rootQuestion);
+  if (answer.toLowerCase() === 'yes' || answer.toLowerCase() === 'y') {
+    const method = await prompt('Do you want to add a verification method you own or generate one? (own/generate): ');
+    if (method.toLowerCase() === 'own' || method.toLowerCase() === 'o') {
+      prompt('Enter your verification method: ', (method) => {
+        answers.verificationMethod.push(method);
+      });
+    } else if (method.toLowerCase() === 'generate' || method.toLowerCase() === 'g') {
+      const generatedMethod = `generated-method-${Date.now()}`;
+      console.log(`Generated method: ${generatedMethod}`);
+      answers.verificationMethod.push(generatedMethod);
+    } else {
+      console.log('Invalid option. Please enter "own" or "generate".');
+    }
+    askVerificationMethod(rootQuestion);
+  } else if (answer.toLowerCase() === 'no' || answer.toLowerCase() === 'n') {
+    askQuestion(currentIndex + 1);
+  } else {
+    console.log('Invalid option. Please enter "yes" or "no".');
+    askVerificationMethod(rootQuestion);
+  }
+}
+
+async function askQuestion (index) {
   if (index < questions.length) {
     const { question, key } = questions[index];
     if (key === 'verificationMethod') {
       answers.verificationMethod = [];
-      askVerificationMethod(question, index);
+      await askVerificationMethod(question, index);
     } else {
-      rl.question(question, (answer) => {
-        if (key === 'id') {
-          const urlObject = new URL(answer); // also does validation
-          answers.url = urlObject.origin;
-        }
+      const answer = await prompt(question);
+      console.log('I didnt wait for the answer', answer);
+      if (key === 'id') {
+        const urlObject = new URL(answer); // also does validation
+        answers.url = urlObject.origin;
+      }
 
-        if (key === 'email' && answer !== '') {
-          validateEmail(answer);
-        }
+      if (key === 'email' && answer !== '') {
+        validateEmail(answer);
+      }
 
-        answers[key] = answer;
-        askQuestion(index + 1);
-      });
+      answers[key] = answer;
+      askQuestion(index + 1);
     }
   } else {
     rl.close();
@@ -68,6 +72,6 @@ const askQuestion = (index) => {
     console.log('Created Issuer Profile:');
     console.log(jsonData);
   }
-};
+}
 
 askQuestion(0);
