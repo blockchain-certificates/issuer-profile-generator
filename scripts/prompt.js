@@ -16,7 +16,7 @@ let answers = {};
 
 function prompt (question) {
   return new Promise((resolve) => {
-    rl.question(question, resolve);
+    rl.question(question, answer => resolve(answer.trim()));
   });
 }
 
