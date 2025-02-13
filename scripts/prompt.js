@@ -20,15 +20,19 @@ function prompt (question) {
   });
 }
 
+function expectedAnswer (answer, expected) {
+  return answer.toLowerCase() === expected || answer.toLowerCase()[0] === expected[0];
+}
+
 async function askVerificationMethod (rootQuestion, currentIndex) {
   const answer = await prompt(rootQuestion);
-  if (answer.toLowerCase() === 'yes' || answer.toLowerCase() === 'y') {
+  if (expectedAnswer(answer, 'yes')) {
     const method = await prompt('Do you want to add a verification method you own or generate one? (own/generate): ');
-    if (method.toLowerCase() === 'own' || method.toLowerCase() === 'o') {
+    if (expectedAnswer(method, 'own')) {
       prompt('Enter your verification method: ', (method) => {
         answers.verificationMethod.push(method);
       });
-    } else if (method.toLowerCase() === 'generate' || method.toLowerCase() === 'g') {
+    } else if (expectedAnswer(method, 'generate')) {
       const generatedMethod = `generated-method-${Date.now()}`;
       console.log(`Generated method: ${generatedMethod}`);
       answers.verificationMethod.push(generatedMethod);
@@ -36,7 +40,7 @@ async function askVerificationMethod (rootQuestion, currentIndex) {
       console.log('Invalid option. Please enter "own" or "generate".');
     }
     askVerificationMethod(rootQuestion);
-  } else if (answer.toLowerCase() === 'no' || answer.toLowerCase() === 'n') {
+  } else if (expectedAnswer(answer, 'no')) {
     askQuestion(currentIndex + 1);
   } else {
     console.log('Invalid option. Please enter "yes" or "no".');
@@ -52,7 +56,6 @@ async function askQuestion (index) {
       await askVerificationMethod(question, index);
     } else {
       const answer = await prompt(question);
-      console.log('I didnt wait for the answer', answer);
       if (key === 'id') {
         const urlObject = new URL(answer); // also does validation
         answers.url = urlObject.origin;
