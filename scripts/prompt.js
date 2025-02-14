@@ -1,6 +1,6 @@
 const generateIssuerProfile = require('../src/generateIssuerProfile');
 const validateEmail = require('../src/validators/email');
-const readline = require('node:readline');
+const readline = require('node:readline/promises');
 const { stdin: input, stdout: output } = require('node:process');
 const rl = readline.createInterface({ input, output });
 
@@ -14,10 +14,8 @@ const questions = [
 
 let answers = {};
 
-function prompt (question) {
-  return new Promise((resolve) => {
-    rl.question(question, answer => resolve(answer.trim()));
-  });
+async function prompt (question) {
+  return await rl.question(question, answer => resolve(answer.trim()));
 }
 
 function expectedAnswer (answer, expected) {
