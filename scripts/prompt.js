@@ -1,5 +1,7 @@
 const generateIssuerProfile = require('../src/generateIssuerProfile');
 const validateEmail = require('../src/validators/email');
+const generateMerkleProof2019 = require('../src/keyGenerators/MerkleProof2019');
+const { expectedAnswer } = require('../src/utils');
 const readline = require('node:readline/promises');
 const { stdin: input, stdout: output } = require('node:process');
 const rl = readline.createInterface({ input, output });
@@ -14,12 +16,12 @@ const questions = [
 
 let answers = {};
 
-async function prompt (question) {
-  return await rl.question(question, answer => resolve(answer.trim()));
+const cryptographicSchemes = {
+  MerkleProof2019: generateMerkleProof2019
 }
 
-function expectedAnswer (answer, expected) {
-  return answer.toLowerCase() === expected || answer.toLowerCase()[0] === expected[0];
+async function prompt (question) {
+  return await rl.question(question, answer => resolve(answer.trim()));
 }
 
 async function askVerificationMethod (rootQuestion, currentIndex) {
@@ -31,7 +33,14 @@ async function askVerificationMethod (rootQuestion, currentIndex) {
         answers.verificationMethod.push(method);
       });
     } else if (expectedAnswer(method, 'generate')) {
-      const generatedMethod = `generated-method-${Date.now()}`;
+      let generatedMethod;
+      const cryptographicScheme =
+        await prompt(`Select the type of keys you want to generate: 
+        - (M)erkleProof2019\n`); // EcdsaSd2023, EcdsaSecp256k1Signature2019, Ed25519Signature2020
+      if (expectedAnswer(cryptographicScheme, 'MerkleProof2019')) {
+        generatedMethod = await cryptographicSchemes.MerkleProof2019(prompt);
+      }
+
       console.log(`Generated method: ${generatedMethod}`);
       answers.verificationMethod.push(generatedMethod);
     } else {
