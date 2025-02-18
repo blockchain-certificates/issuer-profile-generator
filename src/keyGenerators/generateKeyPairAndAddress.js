@@ -5,62 +5,52 @@ const { getPath } = require('./blockchainUtils');
 const { getBTCAddress, getBTCNetworkInfo} = require('./blockchain/btc');
 const { jwkFrom } = require('../keyUtils');
 // const { fromJwk } = require('@digitalbazaar/ecdsa-multikey');
-const {getEthereumAddressFromPrivateKey} = require("./blockchain/eth");
+const { getEthereumAddressFromPrivateKey } = require('./blockchain/eth');
+const log = require('../utils/log');
 
 function generateKeyPairAndAddress (blockchain, network) {
   const mnemonic = bip39.generateMnemonic();
+  log.spacer();
   console.warn('mnenomic phrase generated (store it safely!):');
-  console.log(mnemonic);
+  log.red(mnemonic);
+  log.spacer();
   const seed = bip39.mnemonicToSeedSync(mnemonic);
 
+  let bitcoinNetwork = blockchain === 'bitcoin' ? getBTCNetworkInfo(network) : null;
+
+  const path = getPath(network);
+  const node = bip32.fromSeed(seed, bitcoinNetwork);
+  const derived = node.derivePath(path);
+  const { privateKey, publicKey } = derived;
+
+  console.log('private key bip32 generated', privateKey.toString('hex'), 'is valid: ', secp256k1.privateKeyVerify(privateKey));
+  console.log('public key bip32 generated', publicKey.toString('hex'));
+
+  console.log('\n\nUse the following private key representation for cert-issuer (in pk_issuer.txt):');
+  console.log('(keep it private!!)');
   if (blockchain === 'bitcoin') {
-    let bitcoinNetwork = getBTCNetworkInfo(network);
-
-    // console.log('HEX format', seed.toString('hex'));
-    const path = getPath(network);
-    const node = bip32.fromSeed(seed, bitcoinNetwork);
-    const derived = node.derivePath(path);
-    const { privateKey, publicKey } = derived;
-    // console.log('buffer', privateKey);
-    console.log('private key bip32 generated', privateKey.toString('hex'), 'is valid: ', secp256k1.privateKeyVerify(privateKey));
-    console.log('public key bip32 generated', publicKey.toString('hex'));
-    console.log('WIF (this private information is needed for cert-issuer)', derived.toWIF());
-
-    const bitcoinAddress = getBTCAddress(publicKey, network);
-    console.log('bitcoin address generated', bitcoinAddress);
-
-    const publicKeyJwk = jwkFrom(publicKey);
-
-    // publicKeyJwk.crv = 'K-256';
-    // const publicKeyMultibase = await fromJwk({ jwk: publicKeyJwk });
-
-    return {
-      address: bitcoinAddress,
-      blockchain,
-      publicKeyJwk,
-      // publicKeyMultibase
-    };
+    log.red(`${derived.toWIF()}`);
   } else if (blockchain === 'ethereum') {
-    const path = getPath(network);
-    const node = bip32.fromSeed(seed, null);
-    const derived = node.derivePath(path);
-    const { privateKey, publicKey } = derived;
+    log.red('0x' + privateKey.toString('hex'));
+  }
+  log.spacer();
 
-    console.log('private key bip32 generated', privateKey.toString('hex'), 'is valid: ', secp256k1.privateKeyVerify(privateKey));
-    console.log('public key bip32 generated', publicKey.toString('hex'));
+  const publicKeyJwk = jwkFrom(publicKey);
 
-    const ethereumAddress = getEthereumAddressFromPrivateKey(privateKey);
-    const publicKeyJwk = jwkFrom(publicKey);
+  // publicKeyJwk.crv = 'K-256';
+  // const publicKeyMultibase = await fromJwk({ jwk: publicKeyJwk });
 
-    // publicKeyJwk.crv = 'K-256';
-    // const publicKeyMultibase = await fromJwk({ jwk: publicKeyJwk });
+  const address = blockchain === 'bitcoin' ? getBTCAddress(publicKey, network) : getEthereumAddressFromPrivateKey(privateKey);
 
-    return {
-      address: ethereumAddress,
-      blockchain,
-      publicKeyJwk,
-      // publicKeyMultibase
-    };
+  console.warn('issuing address generated (remember to add some fund to it before issuance): ');
+  log.red(address);
+  log.spacer();
+
+  return {
+    address,
+    blockchain,
+    publicKeyJwk,
+    // publicKeyMultibase
   }
 }
 

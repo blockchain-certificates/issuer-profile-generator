@@ -1,7 +1,7 @@
 const generateIssuerProfile = require('../src/generateIssuerProfile');
 const validateEmail = require('../src/validators/email');
 const generateMerkleProof2019 = require('../src/keyGenerators/MerkleProof2019');
-const { expectedAnswer } = require('../src/utils');
+const { expectedAnswer } = require('../src/utils/utils');
 const readline = require('node:readline/promises');
 const { stdin: input, stdout: output } = require('node:process');
 const rl = readline.createInterface({ input, output });
