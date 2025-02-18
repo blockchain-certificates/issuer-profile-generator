@@ -25,19 +25,14 @@ async function askQuestion (prompt, index) {
     }
     if (expectedAnswer(answer, 'mainnet')) {
       answers[key] = 'mainnet';
-      if (answers.blockchain === 'bitcoin') {
-        answers[key] = answers.blockchain; // align with bitcoin-js network names
-      }
     }
     if (expectedAnswer(answer, 'testnet')) {
       answers[key] = 'testnet';
     }
     if (index + 1 === questions.length) {
-      if (answers.blockchain === 'bitcoin') {
-        const generateFromBip32 = require('./blockchain/btc');
-        const keyPair = generateFromBip32(answers.network);
-        console.log('Generated key pair:', keyPair);
-      }
+      const generateKeyPairAndAddress = require('./generateKeyPairAndAddress');
+      const keyPair = generateKeyPairAndAddress(answers.blockchain, answers.network);
+      console.log('Generated key pair:', keyPair);
     } else {
       await askQuestion(prompt,index + 1);
     }

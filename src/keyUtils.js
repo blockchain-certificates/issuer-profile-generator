@@ -51,8 +51,15 @@ const publicKeyJwkFromPublicKeyHex = (publicKeyHex) => {
   };
 };
 
+function jwkFrom (key, isPrivate = false) /* @trust/keyto */ {
+  // TODO: should we keep the `kid` property?
+  const keyToHexString = key.toString('hex');
+  if (isPrivate) {
+    return privateKeyJwkFromPrivateKeyHex(keyToHexString);
+  }
+  return publicKeyJwkFromPublicKeyHex(keyToHexString);
+}
 
 module.exports = {
-  privateKeyJwkFromPrivateKeyHex,
-  publicKeyJwkFromPublicKeyHex
+  jwkFrom
 }
