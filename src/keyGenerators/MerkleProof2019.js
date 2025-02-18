@@ -42,9 +42,11 @@ async function askQuestion (prompt, index) {
   }
 }
 
-async function generateMerkleProof2019VerificationMethod (prompt) {
+async function generateMerkleProof2019VerificationMethod (prompt, controller) {
   console.log('Generating keys for a MerkleProof2019...');
   await askQuestion(prompt, 0);
+  const id = controller + '#' + generatedVerificationMethod.address;
+  generatedVerificationMethod.id = id;
   return generatedVerificationMethod;
 }
 

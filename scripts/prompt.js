@@ -39,7 +39,17 @@ async function askVerificationMethod (rootQuestion, currentIndex) {
         - (M)erkleProof2019\n`); // EcdsaSd2023, EcdsaSecp256k1Signature2019, Ed25519Signature2020
 
       if (expectedAnswer(cryptographicScheme, 'MerkleProof2019')) {
-        generatedMethod = await cryptographicSchemes.MerkleProof2019(prompt);
+        generatedMethod = await cryptographicSchemes.MerkleProof2019(prompt, answers.id);
+
+        if (generatedMethod.address) {
+          if (!answers.publicKey) {
+            answers.publicKey = [];
+          }
+          answers.publicKey.push({
+            id: 'ecdsa-koblitz-pubkey:' + generatedMethod.address,
+            created: new Date().toISOString()
+          })
+        }
       }
 
       console.log(`Generated method:`, generatedMethod);
