@@ -12,6 +12,7 @@ const questions = [
 ];
 
 const answers = {};
+let generatedVerificationMethod;
 
 async function askQuestion (prompt, index) {
   if (index < questions.length) {
@@ -31,8 +32,8 @@ async function askQuestion (prompt, index) {
     }
     if (index + 1 === questions.length) {
       const generateKeyPairAndAddress = require('./generateKeyPairAndAddress');
-      const keyPair = generateKeyPairAndAddress(answers.blockchain, answers.network);
-      console.log('Generated key pair:', keyPair);
+      const keyPair = await generateKeyPairAndAddress(answers.blockchain, answers.network);
+      generatedVerificationMethod = keyPair;
     } else {
       await askQuestion(prompt,index + 1);
     }
@@ -41,9 +42,10 @@ async function askQuestion (prompt, index) {
   }
 }
 
-async function generateMerkleProof2019 (prompt) {
+async function generateMerkleProof2019VerificationMethod (prompt) {
   console.log('Generating keys for a MerkleProof2019...');
   await askQuestion(prompt, 0);
+  return generatedVerificationMethod;
 }
 
-module.exports = generateMerkleProof2019;
+module.exports = generateMerkleProof2019VerificationMethod;

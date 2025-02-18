@@ -37,11 +37,12 @@ async function askVerificationMethod (rootQuestion, currentIndex) {
       const cryptographicScheme =
         await prompt(`Select the type of keys you want to generate: 
         - (M)erkleProof2019\n`); // EcdsaSd2023, EcdsaSecp256k1Signature2019, Ed25519Signature2020
+
       if (expectedAnswer(cryptographicScheme, 'MerkleProof2019')) {
         generatedMethod = await cryptographicSchemes.MerkleProof2019(prompt);
       }
 
-      console.log(`Generated method: ${generatedMethod}`);
+      console.log(`Generated method:`, generatedMethod);
       answers.verificationMethod.push(generatedMethod);
     } else {
       console.log('Invalid option. Please enter "own/o" or "generate/g".');

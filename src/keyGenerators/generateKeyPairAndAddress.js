@@ -35,7 +35,8 @@ function generateKeyPairAndAddress (blockchain, network) {
     // const publicKeyMultibase = await fromJwk({ jwk: publicKeyJwk });
 
     return {
-      bitcoinAddress,
+      address: bitcoinAddress,
+      blockchain,
       publicKeyJwk,
       // publicKeyMultibase
     };
@@ -55,7 +56,8 @@ function generateKeyPairAndAddress (blockchain, network) {
     // const publicKeyMultibase = await fromJwk({ jwk: publicKeyJwk });
 
     return {
-      ethereumAddress,
+      address: ethereumAddress,
+      blockchain,
       publicKeyJwk,
       // publicKeyMultibase
     };
