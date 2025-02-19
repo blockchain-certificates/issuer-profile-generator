@@ -47,6 +47,8 @@ async function generateMerkleProof2019VerificationMethod (prompt, controller) {
   await askQuestion(prompt, 0);
   const id = controller + '#' + generatedVerificationMethod.address;
   generatedVerificationMethod.id = id;
+  generatedVerificationMethod.controller = controller;
+  generatedVerificationMethod.type = 'EcdsaSecp256k1VerificationKey2019';
   return generatedVerificationMethod;
 }
 
