@@ -2,6 +2,7 @@ const generateIssuerProfile = require('../src/generateIssuerProfile');
 const validateEmail = require('../src/validators/email');
 const generateMerkleProof2019 = require('../src/keyGenerators/MerkleProof2019');
 const { expectedAnswer } = require('../src/utils/utils');
+const log = require('../src/utils/log');
 const readline = require('node:readline/promises');
 const { stdin: input, stdout: output } = require('node:process');
 const rl = readline.createInterface({ input, output });
@@ -24,13 +25,48 @@ async function prompt (question) {
   return await rl.question(question, answer => resolve(answer.trim()));
 }
 
+async function askPurpose (method) {
+  const purpose = await prompt('Select the purpose of the verification method: ' +
+    '(a)ssertion (default), aut(h)entication, capability (d)elegation, capability (i)nvocation ');
+  if (expectedAnswer(purpose, 'assertion') || purpose === '') {
+    if (!answers.assertionMethod) {
+      answers.assertionMethod = [];
+    }
+    answers.assertionMethod.push(method.id);
+  }
+
+  if (expectedAnswer(purpose, 'authentication', 'h')) {
+    if (!answers.authentication) {
+      answers.authentication = [];
+    }
+    answers.authentication.push(method.id);
+  }
+
+  if (expectedAnswer(purpose, 'capability delegation', 'd')) {
+    if (!answers.capabilityDelegation) {
+      answers.capabilityDelegation = [];
+    }
+    answers.capabilityDelegation.push(method.id);
+  }
+
+  if (expectedAnswer(purpose, 'capability invocation', 'i')) {
+    if (!answers.capabilityInvocation) {
+      answers.capabilityInvocation = [];
+    }
+    answers.capabilityInvocation.push(method.id);
+  }
+}
+
 async function askVerificationMethod (rootQuestion, currentIndex) {
   const answer = await prompt(rootQuestion);
+  let specifiedMethod;
   if (expectedAnswer(answer, 'yes')) {
     const method = await prompt('Do you want to add a verification method you own or generate one? (o)wn/(g)enerate: ');
     if (expectedAnswer(method, 'own')) {
-      const method = await prompt('Enter your verification method: ');
-      answers.verificationMethod.push(method);
+      const method = await prompt('Enter your verification method, as JSON ' +
+        '(please minify it: remove line breaks and whitespaces): ');
+      specifiedMethod = JSON.parse(method); // TODO: add verification method validation
+      answers.verificationMethod.push(specifiedMethod);
     } else if (expectedAnswer(method, 'generate')) {
       let generatedMethod;
       const cryptographicScheme =
@@ -51,41 +87,14 @@ async function askVerificationMethod (rootQuestion, currentIndex) {
         }
       }
 
+      specifiedMethod = generatedMethod;
       console.log(`Generated method:`, generatedMethod);
       answers.verificationMethod.push(generatedMethod);
-
-      const purpose = await prompt('Select the purpose of the verification method: ' +
-        '(a)ssertion (default), aut(h)entication, capability (d)elegation, capability (i)nvocation ');
-      if (expectedAnswer(purpose, 'assertion') || purpose === '') {
-        if (!answers.assertionMethod) {
-          answers.assertionMethod = [];
-        }
-        answers.assertionMethod.push(generatedMethod.id);
-      }
-
-      if (expectedAnswer(purpose, 'authentication', 'h')) {
-        if (!answers.authentication) {
-          answers.authentication = [];
-        }
-        answers.authentication.push(generatedMethod.id);
-      }
-
-      if (expectedAnswer(purpose, 'capability delegation', 'd')) {
-        if (!answers.capabilityDelegation) {
-          answers.capabilityDelegation = [];
-        }
-        answers.capabilityDelegation.push(generatedMethod.id);
-      }
-
-      if (expectedAnswer(purpose, 'capability invocation', 'i')) {
-        if (!answers.capabilityInvocation) {
-          answers.capabilityInvocation = [];
-        }
-        answers.capabilityInvocation.push(generatedMethod.id);
-      }
+      log.spacer();
     } else {
       console.log('Invalid option. Please enter "own/o" or "generate/g".');
     }
+    await askPurpose(specifiedMethod);
     askVerificationMethod(rootQuestion);
   } else if (expectedAnswer(answer, 'no') || answer === '') {
     askQuestion(currentIndex + 1);
