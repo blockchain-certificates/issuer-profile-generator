@@ -29,9 +29,8 @@ async function askVerificationMethod (rootQuestion, currentIndex) {
   if (expectedAnswer(answer, 'yes')) {
     const method = await prompt('Do you want to add a verification method you own or generate one? (o)wn/(g)enerate: ');
     if (expectedAnswer(method, 'own')) {
-      prompt('Enter your verification method: ', (method) => {
-        answers.verificationMethod.push(method);
-      });
+      const method = await prompt('Enter your verification method: ');
+      answers.verificationMethod.push(method);
     } else if (expectedAnswer(method, 'generate')) {
       let generatedMethod;
       const cryptographicScheme =
@@ -54,6 +53,36 @@ async function askVerificationMethod (rootQuestion, currentIndex) {
 
       console.log(`Generated method:`, generatedMethod);
       answers.verificationMethod.push(generatedMethod);
+
+      const purpose = await prompt('Select the purpose of the verification method: ' +
+        '(a)ssertion (default), aut(h)entication, capability (d)elegation, capability (i)nvocation ');
+      if (expectedAnswer(purpose, 'assertion') || purpose === '') {
+        if (!answers.assertionMethod) {
+          answers.assertionMethod = [];
+        }
+        answers.assertionMethod.push(generatedMethod.id);
+      }
+
+      if (expectedAnswer(purpose, 'authentication', 'h')) {
+        if (!answers.authentication) {
+          answers.authentication = [];
+        }
+        answers.authentication.push(generatedMethod.id);
+      }
+
+      if (expectedAnswer(purpose, 'capability delegation', 'd')) {
+        if (!answers.capabilityDelegation) {
+          answers.capabilityDelegation = [];
+        }
+        answers.capabilityDelegation.push(generatedMethod.id);
+      }
+
+      if (expectedAnswer(purpose, 'capability invocation', 'i')) {
+        if (!answers.capabilityInvocation) {
+          answers.capabilityInvocation = [];
+        }
+        answers.capabilityInvocation.push(generatedMethod.id);
+      }
     } else {
       console.log('Invalid option. Please enter "own/o" or "generate/g".');
     }
