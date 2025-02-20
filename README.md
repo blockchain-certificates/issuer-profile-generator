@@ -21,4 +21,4 @@ TODO:
   - [ ] allow self signing?
 - [ ] propose generating a DID document
   - [ ] methods TBD
-- [ ] save the issuer profile in a file
+- [x] save the issuer profile in a file
