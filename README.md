@@ -2,6 +2,8 @@
 
 A CLI tool to generate a Blockcerts Issuer Profile.
 
+The tool allows the creation of Blockchain (BTC and ETH) addresses outputting mnemonic, private key and issuing address, and will store the corresponding public key into the Issuer Profile.
+
 ## Usage
 
 ```bash
