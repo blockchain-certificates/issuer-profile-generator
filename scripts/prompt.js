@@ -5,6 +5,7 @@ const { expectedAnswer } = require('../src/utils/utils');
 const log = require('../src/utils/log');
 const readline = require('node:readline/promises');
 const { stdin: input, stdout: output } = require('node:process');
+const fs = require("fs");
 const rl = readline.createInterface({ input, output });
 
 const questions = [
@@ -104,6 +105,25 @@ async function askVerificationMethod (rootQuestion, currentIndex) {
   }
 }
 
+async function handleSaveFile (jsonData) {
+  const toSave = await prompt('Do you want to save the issuer profile to a file? (y)es/(n)o. ' +
+    'Default is no and the document will be output in the console: ');
+  if (expectedAnswer(toSave, 'no')) {
+    console.log('Created Issuer Profile:');
+    console.log(jsonData);
+  } else if (expectedAnswer(toSave, 'yes')) {
+    let fileName = await prompt('Enter the name of the file to save the issuer profile (default: issuer-profile-{name}-{date).jsom: ');
+    if (fileName === '') {
+      fileName = `issuer-profile-${answers.name ? answers.name.toLowerCase() : 'issuer'}-${Date.now()}.json`;
+    }
+
+    const fs = require('fs');
+    const path = './output/unsigned/';
+    fs.writeFileSync(path + fileName, jsonData);
+    log.green('File saved to ' + path + fileName);
+  }
+}
+
 async function askQuestion (index) {
   if (index < questions.length) {
     const { question, key } = questions[index];
@@ -125,11 +145,10 @@ async function askQuestion (index) {
       askQuestion(index + 1);
     }
   } else {
-    rl.close();
     const issuerProfile = generateIssuerProfile(answers);
-    const jsonData = JSON.stringify(issuerProfile, null, 4);
-    console.log('Created Issuer Profile:');
-    console.log(jsonData);
+    const jsonData = JSON.stringify(issuerProfile, null, 2);
+    await handleSaveFile(jsonData);
+    rl.close();
   }
 }
 
