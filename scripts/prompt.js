@@ -1,6 +1,6 @@
 const generateIssuerProfile = require('../src/generateIssuerProfile');
 const validateEmail = require('../src/validators/email');
-const { expectedAnswer } = require('../src/utils/utils');
+const { expectedAnswer } = require('../src/utils/expectedAnswer');
 const handleKeyGeneration = require('../src/keyGenerators/handleKeyGeneration');
 const sanitizeVerificationMethod = require('../src/keyGenerators/utils/sanitizeVerificationMethod');
 const log = require('../src/utils/log');
