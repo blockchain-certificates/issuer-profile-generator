@@ -4,7 +4,7 @@
   "description": "a helper to generate blockcerts issuer profiles",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "vitest"
   },
   "author": "Julien Fraichot",
   "license": "ISC",
@@ -22,5 +22,8 @@
     "keccak": "^3.0.4",
     "secp256k1": "^5.0.1",
     "web3": "^4.16.0"
+  },
+  "devDependencies": {
+    "vitest": "^3.0.6"
   }
 }
