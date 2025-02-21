@@ -1,4 +1,5 @@
 const generateSeed = require('../utils/generateSeed');
+const log = require('../utils/log');
 
 async function generateEd25519VerificationMethod (prompt, controller, mnemonicSeed = '') {
   const seed = generateSeed(mnemonicSeed);
@@ -9,7 +10,13 @@ async function generateEd25519VerificationMethod (prompt, controller, mnemonicSe
     seed: seed32Array,
     controller
   });
+
+  log.spacer();
+  console.log('private key multibase format (store it safely!):');
+  log.red('', keyPair.privateKeyMultibase);
+  log.spacer()
   // console.log('ed25519 keyPair', keyPair);
+  delete keyPair.privateKeyMultibase;
   return keyPair;
 }
 
