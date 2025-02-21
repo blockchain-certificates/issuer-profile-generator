@@ -112,7 +112,7 @@ async function askVerificationMethod (rootQuestion, currentIndex) {
 async function handleSaveFile (jsonData) {
   const toSave = await prompt('Do you want to save the issuer profile to a file? (y)es/(n)o. ' +
     'Default is no and the document will be output in the console: ');
-  if (expectedAnswer(toSave, 'no')) {
+  if (expectedAnswer(toSave, 'no') || toSave === '') {
     console.log('Created Issuer Profile:');
     console.log(jsonData);
   } else if (expectedAnswer(toSave, 'yes')) {
