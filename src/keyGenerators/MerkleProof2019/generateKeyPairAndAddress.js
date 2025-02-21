@@ -1,21 +1,15 @@
-const bip39 = require("bip39");
-const bip32 = require("bip32");
-const secp256k1 = require("secp256k1");
+const bip32 = require('bip32');
+const secp256k1 = require('secp256k1');
+const generateSeed = require('../utils/generateSeed');
 const { getPath } = require('./blockchainUtils');
 const { getBTCAddress, getBTCNetworkInfo} = require('./blockchain/btc');
-const { jwkFrom } = require('../keyUtils');
+const { jwkFrom } = require('../../keyUtils');
 // const { fromJwk } = require('@digitalbazaar/ecdsa-multikey');
 const { getEthereumAddressFromPrivateKey } = require('./blockchain/eth');
-const log = require('../utils/log');
+const log = require('../../utils/log');
 
 function generateKeyPairAndAddress (blockchain, network) {
-  const mnemonic = bip39.generateMnemonic();
-  log.spacer();
-  console.warn('mnenomic phrase generated (store it safely!):');
-  log.red(mnemonic);
-  log.spacer();
-  const seed = bip39.mnemonicToSeedSync(mnemonic);
-
+  const seed = generateSeed();
   let bitcoinNetwork = blockchain === 'bitcoin' ? getBTCNetworkInfo(network) : null;
 
   const path = getPath(network);

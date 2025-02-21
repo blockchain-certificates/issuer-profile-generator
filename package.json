@@ -10,6 +10,7 @@
   "license": "ISC",
   "dependencies": {
     "@digitalbazaar/ecdsa-multikey": "^1.8.0",
+    "@digitalbazaar/ed25519-verification-key-2020": "^4.2.0",
     "@trust/keyto": "^1.0.1",
     "base64url": "^3.0.1",
     "bip32": "^2.0.6",
