@@ -1,7 +1,7 @@
 const generateSeed = require('../utils/generateSeed');
 
-async function generateEd25519VerificationMethod (prompt, controller) {
-  const seed = generateSeed();
+async function generateEd25519VerificationMethod (prompt, controller, mnemonicSeed = '') {
+  const seed = generateSeed(mnemonicSeed);
   const seed32Bytes = seed.slice(0, 32);
   const seed32Array = new Uint8Array(seed32Bytes);
   const { Ed25519VerificationKey2020 } = await import('@digitalbazaar/ed25519-verification-key-2020');

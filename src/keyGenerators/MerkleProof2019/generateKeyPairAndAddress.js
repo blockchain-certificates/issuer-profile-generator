@@ -8,8 +8,12 @@ const { jwkFrom } = require('../../keyUtils');
 const { getEthereumAddressFromPrivateKey } = require('./blockchain/eth');
 const log = require('../../utils/log');
 
-function generateKeyPairAndAddress (blockchain, network) {
-  const seed = generateSeed();
+function generateKeyPairAndAddress ({
+  blockchain,
+  network,
+  mnemonicSeed = ''
+}) {
+  const seed = generateSeed(mnemonicSeed);
   let bitcoinNetwork = blockchain === 'bitcoin' ? getBTCNetworkInfo(network) : null;
 
   const path = getPath(network);

@@ -1,4 +1,5 @@
 const { expectedAnswer } = require('../../utils/utils');
+const generateKeyPairAndAddress = require('./generateKeyPairAndAddress');
 
 const questions = [
   {
@@ -31,9 +32,7 @@ async function askQuestion (prompt, index) {
       answers[key] = 'testnet';
     }
     if (index + 1 === questions.length) {
-      const generateKeyPairAndAddress = require('./generateKeyPairAndAddress');
-      const keyPair = await generateKeyPairAndAddress(answers.blockchain, answers.network);
-      generatedVerificationMethod = keyPair;
+      return;
     } else {
       await askQuestion(prompt,index + 1);
     }
@@ -42,9 +41,14 @@ async function askQuestion (prompt, index) {
   }
 }
 
-async function generateMerkleProof2019VerificationMethod (prompt, controller) {
+async function generateMerkleProof2019VerificationMethod (prompt, controller, seed) {
   console.log('Generating keys for a MerkleProof2019...');
   await askQuestion(prompt, 0);
+  if (seed) {
+    generatedVerificationMethod = await generateKeyPairAndAddress(seed);
+  } else {
+    generatedVerificationMethod = await generateKeyPairAndAddress(answers.blockchain, answers.network);
+  }
   const id = controller + '#' + generatedVerificationMethod.address;
   generatedVerificationMethod.id = id;
   generatedVerificationMethod.controller = controller;
