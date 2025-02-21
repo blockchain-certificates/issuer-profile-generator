@@ -1,4 +1,4 @@
-const { expectedAnswer } = require('../utils/utils');
+const { expectedAnswer } = require('../../utils/utils');
 
 const questions = [
   {

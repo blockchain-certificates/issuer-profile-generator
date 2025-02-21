@@ -1,6 +1,7 @@
 const generateIssuerProfile = require('../src/generateIssuerProfile');
 const validateEmail = require('../src/validators/email');
 const generateMerkleProof2019 = require('../src/keyGenerators/MerkleProof2019');
+const generateEd25519 = require('../src/keyGenerators/Ed25519');
 const { expectedAnswer } = require('../src/utils/utils');
 const log = require('../src/utils/log');
 const readline = require('node:readline/promises');
@@ -19,7 +20,8 @@ const questions = [
 let answers = {};
 
 const cryptographicSchemes = {
-  MerkleProof2019: generateMerkleProof2019
+  MerkleProof2019: generateMerkleProof2019,
+  Ed25519: generateEd25519
 }
 
 async function prompt (question) {
@@ -72,7 +74,9 @@ async function askVerificationMethod (rootQuestion, currentIndex) {
       let generatedMethod;
       const cryptographicScheme =
         await prompt(`Select the type of keys you want to generate: 
-        - (M)erkleProof2019\n`); // EcdsaSd2023, EcdsaSecp256k1Signature2019, Ed25519Signature2020
+        - (M)erkleProof2019
+        - E(d)25519Signature2020\n`
+        ); // EcdsaSd2023, EcdsaSecp256k1Signature2019
 
       if (expectedAnswer(cryptographicScheme, 'MerkleProof2019')) {
         generatedMethod = await cryptographicSchemes.MerkleProof2019(prompt, answers.id);
@@ -84,8 +88,12 @@ async function askVerificationMethod (rootQuestion, currentIndex) {
           answers.publicKey.push({
             id: 'ecdsa-koblitz-pubkey:' + generatedMethod.address,
             created: new Date().toISOString()
-          })
+          });
         }
+      }
+
+      if (expectedAnswer(cryptographicScheme, 'Ed25519Signature2020', 'd')) {
+        generatedMethod = await cryptographicSchemes.Ed25519(prompt, answers.id);
       }
 
       specifiedMethod = generatedMethod;
