@@ -1,7 +1,10 @@
 const bip39 = require('bip39');
 const log = require('../../utils/log');
 
-function generateSeed (mnemonic = bip39.generateMnemonic()) {
+function generateSeed (mnemonic) {
+  if (!mnemonic) {
+    mnemonic = bip39.generateMnemonic()
+  }
   log.spacer();
   console.warn('mnenomic phrase generated (store it safely!):');
   log.red(mnemonic);

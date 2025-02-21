@@ -41,14 +41,14 @@ async function askQuestion (prompt, index) {
   }
 }
 
-async function generateMerkleProof2019VerificationMethod (prompt, controller, seed) {
+async function generateMerkleProof2019VerificationMethod (prompt, controller, mnemonicSeed = '') {
   console.log('Generating keys for a MerkleProof2019...');
   await askQuestion(prompt, 0);
-  if (seed) {
-    generatedVerificationMethod = await generateKeyPairAndAddress(seed);
-  } else {
-    generatedVerificationMethod = await generateKeyPairAndAddress(answers.blockchain, answers.network);
-  }
+  generatedVerificationMethod = generateKeyPairAndAddress({
+    blockchain: answers.blockchain,
+    network: answers.network,
+    mnemonicSeed
+  });
   const id = controller + '#' + generatedVerificationMethod.address;
   generatedVerificationMethod.id = id;
   generatedVerificationMethod.controller = controller;
