@@ -1,12 +1,10 @@
 const generateIssuerProfile = require('../src/generateIssuerProfile');
 const validateEmail = require('../src/validators/email');
-const generateMerkleProof2019 = require('../src/keyGenerators/MerkleProof2019');
-const generateEd25519 = require('../src/keyGenerators/Ed25519');
 const { expectedAnswer } = require('../src/utils/utils');
+const handleKeyGeneration = require('../src/keyGenerators/handleKeyGeneration');
 const log = require('../src/utils/log');
 const readline = require('node:readline/promises');
 const { stdin: input, stdout: output } = require('node:process');
-const fs = require("fs");
 const rl = readline.createInterface({ input, output });
 
 const questions = [
@@ -18,11 +16,6 @@ const questions = [
 ];
 
 let answers = {};
-
-const cryptographicSchemes = {
-  MerkleProof2019: generateMerkleProof2019,
-  Ed25519: generateEd25519
-}
 
 async function prompt (question) {
   return await rl.question(question, answer => resolve(answer.trim()));
@@ -66,43 +59,46 @@ async function askVerificationMethod (rootQuestion, currentIndex) {
   if (expectedAnswer(answer, 'yes')) {
     const method = await prompt('Do you want to add a verification method you own or generate one? (o)wn/(g)enerate: ');
     if (expectedAnswer(method, 'own')) {
-      const method = await prompt('Enter your verification method, as JSON ' +
+      const methodOrMnemomic = await prompt('Enter your mnemonic phrase for the key or the verification method as JSON ' +
         '(please minify it: remove line breaks and whitespaces): ');
-      specifiedMethod = JSON.parse(method); // TODO: add verification method validation
-      answers.verificationMethod.push(specifiedMethod);
+
+      if (methodOrMnemomic.startsWith('{')) {
+        specifiedMethod = JSON.parse(method); // TODO: add verification method validation
+      } else {
+        const cryptographicScheme =
+          await prompt(`Select the type of keys you want to add: 
+        - (M)erkleProof2019
+        - E(d)25519Signature2020\n`
+          ); // EcdsaSd2023, EcdsaSecp256k1Signature2019
+
+        specifiedMethod = await handleKeyGeneration(cryptographicScheme, prompt, answers.id, methodOrMnemomic);
+      }
     } else if (expectedAnswer(method, 'generate')) {
-      let generatedMethod;
       const cryptographicScheme =
         await prompt(`Select the type of keys you want to generate: 
         - (M)erkleProof2019
         - E(d)25519Signature2020\n`
         ); // EcdsaSd2023, EcdsaSecp256k1Signature2019
 
-      if (expectedAnswer(cryptographicScheme, 'MerkleProof2019')) {
-        generatedMethod = await cryptographicSchemes.MerkleProof2019(prompt, answers.id);
-
-        if (generatedMethod.address) {
-          if (!answers.publicKey) {
-            answers.publicKey = [];
-          }
-          answers.publicKey.push({
-            id: 'ecdsa-koblitz-pubkey:' + generatedMethod.address,
-            created: new Date().toISOString()
-          });
-        }
-      }
-
-      if (expectedAnswer(cryptographicScheme, 'Ed25519Signature2020', 'd')) {
-        generatedMethod = await cryptographicSchemes.Ed25519(prompt, answers.id);
-      }
-
-      specifiedMethod = generatedMethod;
-      console.log(`Generated method:`, generatedMethod);
-      answers.verificationMethod.push(generatedMethod);
-      log.spacer();
+      specifiedMethod = await handleKeyGeneration(cryptographicScheme, prompt, answers.id);
     } else {
       console.log('Invalid option. Please enter "own/o" or "generate/g".');
     }
+
+    console.log(`Generated method:`, specifiedMethod);
+    answers.verificationMethod.push(specifiedMethod);
+    log.spacer();
+
+    if (specifiedMethod.address) {
+      if (!answers.publicKey) {
+        answers.publicKey = [];
+      }
+      answers.publicKey.push({
+        id: 'ecdsa-koblitz-pubkey:' + specifiedMethod.address,
+        created: new Date().toISOString()
+      });
+    }
+
     await askPurpose(specifiedMethod);
     askVerificationMethod(rootQuestion);
   } else if (expectedAnswer(answer, 'no') || answer === '') {
@@ -116,7 +112,7 @@ async function askVerificationMethod (rootQuestion, currentIndex) {
 async function handleSaveFile (jsonData) {
   const toSave = await prompt('Do you want to save the issuer profile to a file? (y)es/(n)o. ' +
     'Default is no and the document will be output in the console: ');
-  if (expectedAnswer(toSave, 'no')) {
+  if (expectedAnswer(toSave, 'no') || toSave === '') {
     console.log('Created Issuer Profile:');
     console.log(jsonData);
   } else if (expectedAnswer(toSave, 'yes')) {

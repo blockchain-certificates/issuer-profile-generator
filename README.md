@@ -18,7 +18,7 @@ TODO:
   - [x] store public key in verificationMethod
   - [x] if a blockchain, provide the address in the stdout
   - [x] let user select the purpose of the key
-  - [ ] allow creating key from seed phrase
+  - [x] allow creating key from seed phrase
 - [ ] sign the issuer profile
   - [ ] manage external controller
   - [ ] allow self signing?
