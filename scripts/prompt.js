@@ -2,6 +2,7 @@ const generateIssuerProfile = require('../src/generateIssuerProfile');
 const validateEmail = require('../src/validators/email');
 const { expectedAnswer } = require('../src/utils/utils');
 const handleKeyGeneration = require('../src/keyGenerators/handleKeyGeneration');
+const sanitizeVerificationMethod = require('../src/keyGenerators/utils/sanitizeVerificationMethod');
 const log = require('../src/utils/log');
 const readline = require('node:readline/promises');
 const { stdin: input, stdout: output } = require('node:process');
@@ -86,7 +87,7 @@ async function askVerificationMethod (rootQuestion, currentIndex) {
     }
 
     console.log(`Generated method:`, specifiedMethod);
-    answers.verificationMethod.push(specifiedMethod);
+    answers.verificationMethod.push(sanitizeVerificationMethod(specifiedMethod));
     log.spacer();
 
     if (specifiedMethod.address) {

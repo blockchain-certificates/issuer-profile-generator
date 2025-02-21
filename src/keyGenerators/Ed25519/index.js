@@ -16,7 +16,6 @@ async function generateEd25519VerificationMethod (prompt, controller, mnemonicSe
   log.red('', keyPair.privateKeyMultibase);
   log.spacer()
   // console.log('ed25519 keyPair', keyPair);
-  delete keyPair.privateKeyMultibase;
   return keyPair;
 }
 
