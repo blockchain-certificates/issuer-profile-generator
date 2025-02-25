@@ -3,7 +3,7 @@ const path = require('node:path');
 const log = require('../../utils/log');
 
 function storeKeyPair (type, keyPair) {
-  let filePath = path.join(__dirname, `../../../output/keyPairs/keyPair-${type}-${Date.now()}`);
+  let filePath = path.join(__dirname, `../../../output/keyPairs/${type}-${keyPair.publicKeyMultibase}`); // this will fail in MKPRF2019
   let extension = '.json';
   if (typeof keyPair !== 'string') {
     keyPair = JSON.stringify(keyPair, null, 2);

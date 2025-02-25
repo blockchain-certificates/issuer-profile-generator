@@ -9,8 +9,11 @@
   "author": "Julien Fraichot",
   "license": "ISC",
   "dependencies": {
+    "@blockcerts/schemas": "^3.8.0",
     "@digitalbazaar/ecdsa-multikey": "^1.8.0",
+    "@digitalbazaar/ed25519-signature-2020": "^5.4.0",
     "@digitalbazaar/ed25519-verification-key-2020": "^4.2.0",
+    "@digitalbazaar/security-document-loader": "^3.0.0",
     "@trust/keyto": "^1.0.1",
     "base64url": "^3.0.1",
     "bip32": "^2.0.6",
@@ -19,7 +22,9 @@
     "canonicalize": "^2.0.0",
     "elliptic": "^6.6.1",
     "js-sha3": "^0.9.3",
+    "jsonld-signatures": "^11.5.0",
     "keccak": "^3.0.4",
+    "multibase": "^4.0.6",
     "secp256k1": "^5.0.1",
     "web3": "^4.16.0"
   },
