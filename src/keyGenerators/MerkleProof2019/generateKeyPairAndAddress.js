@@ -7,6 +7,7 @@ const { jwkFrom } = require('../../keyUtils');
 // const { fromJwk } = require('@digitalbazaar/ecdsa-multikey');
 const { getEthereumAddressFromPrivateKey } = require('./blockchain/eth');
 const log = require('../../utils/log');
+const storeKeyPair = require('../utils/storeKeyPair');
 
 function generateKeyPairAndAddress ({
   blockchain,
@@ -26,11 +27,14 @@ function generateKeyPairAndAddress ({
 
   console.log('\n\nUse the following private key representation for cert-issuer (in pk_issuer.txt):');
   console.log('(keep it private!!)');
+  let pk_issuer;
   if (blockchain === 'bitcoin') {
-    log.red(`${derived.toWIF()}`);
+    pk_issuer = derived.toWIF();
   } else if (blockchain === 'ethereum') {
-    log.red('0x' + privateKey.toString('hex'));
+    pk_issuer = '0x' + privateKey.toString('hex');
   }
+  log.red(`${pk_issuer}`);
+  storeKeyPair('merkleProof2019', pk_issuer);
   log.spacer();
 
   const publicKeyJwk = jwkFrom(publicKey);

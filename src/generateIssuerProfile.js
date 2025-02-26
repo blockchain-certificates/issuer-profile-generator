@@ -1,9 +1,10 @@
 const skeleton = {
   "@context": [
     "https://www.w3.org/ns/cid/v1",
-    "https://w3id.org/blockcerts/v3"
+    "https://www.w3.org/ns/credentials/v2",
+    "https://w3id.org/blockcerts/v3.2"
   ],
-  "type": "Profile"
+  "type": ["BlockcertsIssuerProfile"]
 }
 
 function generateIssuerProfile(properties) {

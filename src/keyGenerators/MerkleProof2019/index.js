@@ -1,4 +1,4 @@
-const { expectedAnswer } = require('../../utils/utils');
+const { expectedAnswer } = require('../../utils/expectedAnswer');
 const generateKeyPairAndAddress = require('./generateKeyPairAndAddress');
 
 const questions = [

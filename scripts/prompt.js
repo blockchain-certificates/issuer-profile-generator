@@ -1,7 +1,9 @@
 const generateIssuerProfile = require('../src/generateIssuerProfile');
 const validateEmail = require('../src/validators/email');
-const { expectedAnswer } = require('../src/utils/utils');
+const { expectedAnswer } = require('../src/utils/expectedAnswer');
 const handleKeyGeneration = require('../src/keyGenerators/handleKeyGeneration');
+const sanitizeVerificationMethod = require('../src/keyGenerators/utils/sanitizeVerificationMethod');
+const Ed25519Signer = require('../src/signers/Ed25519');
 const log = require('../src/utils/log');
 const readline = require('node:readline/promises');
 const { stdin: input, stdout: output } = require('node:process');
@@ -86,7 +88,7 @@ async function askVerificationMethod (rootQuestion, currentIndex) {
     }
 
     console.log(`Generated method:`, specifiedMethod);
-    answers.verificationMethod.push(specifiedMethod);
+    answers.verificationMethod.push(sanitizeVerificationMethod(specifiedMethod));
     log.spacer();
 
     if (specifiedMethod.address) {
@@ -128,6 +130,27 @@ async function handleSaveFile (jsonData) {
   }
 }
 
+async function handleSignDocument (jsonData) {
+  const toSign = await prompt('Do you want to sign the issuer profile? (y)es/(n)o: ');
+  if (expectedAnswer(toSign, 'no') || toSign === '') {
+    return jsonData;
+  } else if (expectedAnswer(toSign, 'yes')) {
+    const signingSuite = await prompt('Select the signing suite: (M)erkleProof2019, E(d)25519Signature2020: ');
+    if (expectedAnswer(signingSuite, 'merkleproof2019')) {
+      log.yellow(' /!\  Please use blockcerts\' cert-issuer python package to sign the document.')
+      return jsonData;
+    }
+
+    if (expectedAnswer(signingSuite, 'ed25519signature2020', 'd')) {
+      const privateKey = await prompt('Enter the privateKey (multibase) to sign the document: '); // TODO: sign with seed?
+      const publicKey = await prompt('Enter the publicKey (multibase) to sign the document: ');
+      const signed = await Ed25519Signer(privateKey, publicKey, jsonData);
+      console.log(signed);
+      return signed;
+    }
+  }
+}
+
 async function askQuestion (index) {
   if (index < questions.length) {
     const { question, key } = questions[index];
@@ -150,8 +173,8 @@ async function askQuestion (index) {
     }
   } else {
     const issuerProfile = generateIssuerProfile(answers);
-    const jsonData = JSON.stringify(issuerProfile, null, 2);
-    await handleSaveFile(jsonData);
+    const signedDocument = await handleSignDocument(issuerProfile);
+    await handleSaveFile(JSON.stringify(signedDocument, null, 2));
     rl.close();
   }
 }

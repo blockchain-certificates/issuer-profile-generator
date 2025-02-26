@@ -1,4 +1,4 @@
-const {expectedAnswer} = require("../utils/utils");
+const {expectedAnswer} = require("../utils/expectedAnswer");
 const generateMerkleProof2019 = require("./MerkleProof2019");
 const generateEd25519 = require("./Ed25519");
 
