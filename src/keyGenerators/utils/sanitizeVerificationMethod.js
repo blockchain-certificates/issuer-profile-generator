@@ -5,8 +5,8 @@ function sanitizeVerificationMethod (verificationMethod) {
     type: verificationMethod.type,
     controller: verificationMethod.controller,
     [publicKey]: verificationMethod[publicKey],
-    revoked: verificationMethod.revoked,
-    expires: verificationMethod.expires
+    ...verificationMethod.revoked && { revoked: verificationMethod.revoked },
+    ...verificationMethod.expires && { expires: verificationMethod.expires }
   }
 }
 
