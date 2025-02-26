@@ -137,7 +137,7 @@ async function handleSignDocument (jsonData) {
   } else if (expectedAnswer(toSign, 'yes')) {
     const signingSuite = await prompt('Select the signing suite: (M)erkleProof2019, E(d)25519Signature2020: ');
     if (expectedAnswer(signingSuite, 'merkleproof2019')) {
-      console.log('Please use blockcerts\' cert-issuer python package to sign the document.')
+      log.yellow(' /!\  Please use blockcerts\' cert-issuer python package to sign the document.')
       return jsonData;
     }
 
