@@ -21,7 +21,7 @@ TODO:
   - [x] allow creating key from seed phrase
 - [ ] sign the issuer profile
   - [ ] manage external controller
-  - [ ] allow self signing?
+  - [x] allow self signing
 - [ ] propose generating a DID document
   - [ ] methods TBD
 - [x] save the issuer profile in a file
