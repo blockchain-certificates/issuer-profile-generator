@@ -114,9 +114,13 @@ async function askVerificationMethod (rootQuestion, currentIndex) {
 async function handleSaveFile (jsonData) {
   const toSave = await prompt('Do you want to save the issuer profile to a file? (y)es/(n)o. ' +
     'Default is no and the document will be output in the console: ');
+  let documentIsSigned = !!jsonData.proof;
+
+  const documentCreated = JSON.stringify(jsonData, null, 2);
+
   if (expectedAnswer(toSave, 'no') || toSave === '') {
     console.log('Created Issuer Profile:');
-    console.log(jsonData);
+    console.log(documentCreated);
   } else if (expectedAnswer(toSave, 'yes')) {
     let fileName = await prompt('Enter the name of the file to save the issuer profile (default: issuer-profile-{name}-{date).jsom: ');
     if (fileName === '') {
@@ -124,8 +128,8 @@ async function handleSaveFile (jsonData) {
     }
 
     const fs = require('fs');
-    const path = './output/unsigned/';
-    fs.writeFileSync(path + fileName, jsonData);
+    const path = `./output/${documentIsSigned ? 'signed' : 'unsigned'}/`;
+    fs.writeFileSync(path + fileName, documentCreated);
     log.green('File saved to ' + path + fileName);
   }
 }
@@ -174,7 +178,7 @@ async function askQuestion (index) {
   } else {
     const issuerProfile = generateIssuerProfile(answers);
     const signedDocument = await handleSignDocument(issuerProfile);
-    await handleSaveFile(JSON.stringify(signedDocument, null, 2));
+    await handleSaveFile(signedDocument);
     rl.close();
   }
 }
