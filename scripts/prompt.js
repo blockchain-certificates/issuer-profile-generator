@@ -65,7 +65,7 @@ async function askVerificationMethod (rootQuestion, currentIndex) {
         '(please minify it: remove line breaks and whitespaces): ');
 
       if (methodOrMnemomic.startsWith('{')) {
-        specifiedMethod = JSON.parse(method); // TODO: add verification method validation
+        specifiedMethod = JSON.parse(methodOrMnemomic); // TODO: add verification method validation
       } else {
         const cryptographicScheme =
           await prompt(`Select the type of keys you want to add: 
