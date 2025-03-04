@@ -7,7 +7,7 @@ The tool allows the creation of Blockchain (BTC and ETH) addresses outputting mn
 ## Usage
 
 ```bash
-  node scripts/prompt.js
+  node scripts/generate.js
 ```
 
 TODO:
