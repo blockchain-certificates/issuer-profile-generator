@@ -5,9 +5,7 @@ const handleKeyGeneration = require('../src/keyGenerators/handleKeyGeneration');
 const sanitizeVerificationMethod = require('../src/keyGenerators/utils/sanitizeVerificationMethod');
 const Ed25519Signer = require('../src/signers/Ed25519');
 const log = require('../src/utils/log');
-const readline = require('node:readline/promises');
-const { stdin: input, stdout: output } = require('node:process');
-const rl = readline.createInterface({ input, output });
+const { prompt, closeRl } = require('../src/prompt');
 
 const questions = [
   { key: 'id', question: 'Enter the web address where the issuer file will be hosted (full path to file): ' },
@@ -18,10 +16,6 @@ const questions = [
 ];
 
 let answers = {};
-
-async function prompt (question) {
-  return await rl.question(question, answer => resolve(answer.trim()));
-}
 
 async function askPurpose (method) {
   const purpose = await prompt('Select the purpose of the verification method: ' +
@@ -179,7 +173,7 @@ async function askQuestion (index) {
     const issuerProfile = generateIssuerProfile(answers);
     const signedDocument = await handleSignDocument(issuerProfile);
     await handleSaveFile(signedDocument);
-    rl.close();
+    closeRl();
   }
 }
 
