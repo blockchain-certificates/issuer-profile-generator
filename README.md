@@ -6,8 +6,16 @@ The tool allows the creation of Blockchain (BTC and ETH) addresses outputting mn
 
 ## Usage
 
+### Generate an Issuer Profile
+
 ```bash
   node scripts/generate.js
+```
+
+### Sign an existing Issuer Profile
+
+```bash
+  node scripts/sign-existing.js
 ```
 
 TODO:
