@@ -35,7 +35,7 @@ async function loadDocument () {
   }
 
   document = await modernizeDocument(document);
-  console.log('Updated document ready for signature: ', document);
+  console.log('Updated document ready for signature: ', JSON.stringify(document, null, 2));
 
   const userApprovedDocument = await prompt(
     'Do you want to proceed with this document? (y)es/(n)o: ');
@@ -146,9 +146,20 @@ async function modernizeDocument (document) {
   }
 
   document.verificationMethod.forEach(verificationMethod => {
-    if (verificationMethod.publicKeyJwk && verificationMethod.type !== 'JsonWebKey') {
-      verificationMethod.type = 'JsonWebKey';
-      log.yellow(`Updated verificationMethod ${verificationMethod.id} type to ${verificationMethod.type}`);
+    if (
+      verificationMethod.type === 'EcdsaSecp256k1VerificationKey2019' &&
+      !document['@context'].includes(contextUrls.SECP256K1_2019_CONTEXT)
+    ) {
+      document['@context'].push(contextUrls.SECP256K1_2019_CONTEXT);
+      log.yellow(`Updated @context array to include EcdsaSecp256k1VerificationKey2019 context.`);
+    }
+
+    if (
+      verificationMethod.type === 'JsonWebKey2020' &&
+      !document['@context'].includes(contextUrls.JWS_2020_CONTEXT)
+    ) {
+      document['@context'].push(contextUrls.JWS_2020_CONTEXT);
+      log.yellow(`Updated @context array to include JsonWebKey2020 context.`);
     }
   });
 
